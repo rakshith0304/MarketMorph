@@ -12,8 +12,9 @@ reddit = praw.Reddit(
     user_agent="marketmorph" 
 )
 
-# Keywords related to electronics
-keywords = ["airpods", "smartwatch", "drone", "oled tv", "ps5", "gaming laptop"]
+# Load Amazon product names and get unique names
+amazon_df = pd.read_csv("data/ecommerce/amazon_products.csv")
+product_names = amazon_df["name"].dropna().unique().tolist()
 
 # Subreddits to search
 subreddits = ["technology", "gadgets", "headphones", "buildapc", "apple", "Android", "buyitforlife"]
@@ -22,21 +23,19 @@ posts = []
 
 for sub in subreddits:
     print(f"Searching subreddit: r/{sub}") # Added for better progress tracking
-    for keyword in keywords:
-        print(f"  Searching for keyword: {keyword}") # Added for better progress tracking
+    for product in product_names:
+        print(f"  Searching for product: {product[:60]}...")  # Print first 60 chars for readability
         try: # Added error handling for potential subreddit not found or other issues
-            for submission in reddit.subreddit(sub).search(keyword, limit=200):
+            for submission in reddit.subreddit(sub).search(product, limit=20):
                 posts.append({
                     "title": submission.title,
-                    "text": submission.selftext,
                     "subreddit": sub,
-                    "keyword": keyword,
+                    "product_name": product,
                     "upvotes": submission.score,
                     "created": dt.datetime.fromtimestamp(submission.created_utc),
-                    "url": submission.url
                 })
         except Exception as e:
-            print(f"  Error searching r/{sub} for {keyword}: {e}")
+            print(f"  Error searching r/{sub} for {product[:60]}: {e}")
             continue 
 df = pd.DataFrame(posts)
 
@@ -44,6 +43,5 @@ df = pd.DataFrame(posts)
 os.makedirs("data/social", exist_ok=True)
 
 df.to_csv("data/social/reddit_electronics_mentions.csv", index=False)
-print("✅ Reddit data saved!")
 
-## testinf commit
+print(":)))))))))  Reddit data saved!")

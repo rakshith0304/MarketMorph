@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 import random
+import re
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/123.0.0.0 Safari/537.36",
@@ -37,6 +38,26 @@ def get_amazon_products(keyword, num_pages=5):
     df.dropna(subset=["name", "price"], inplace=True)
     return df
 
+def clean_title(title):
+    # Step 1: Title case and remove extra spaces
+    title = title.strip().title()
+
+    # Step 2: Optional keyword cutoff (stop at the first comma or 5–6 words)
+    title = re.split(r"[,-]", title)[0].strip()
+
+    # Step 3: Use regex to extract brand + model (e.g., first 2–3 capitalized words)
+    words = title.split()
+    if len(words) > 2:
+        return " ".join(words[:4])  
+    else:
+        return title
+
+def extract_rating(rating_str):
+    try:
+        return float(rating_str.split()[0])
+    except:
+        return None
+
 if __name__ == "__main__":
     keywords = [
     "wireless earbuds",
@@ -66,6 +87,12 @@ if __name__ == "__main__":
         print(f"Scraping Amazon for: {kw}")
         df = get_amazon_products(kw)
         full_data = pd.concat([full_data, df], ignore_index=True)
-
+    
+    full_data["name"] = full_data["name"].apply(clean_title)
+    full_data["rating"] = full_data["rating"].apply(extract_rating)
+    full_data["review_count"] = pd.to_numeric(full_data["review_count"], errors="coerce")
+    full_data.dropna(subset=["rating","review_count"], inplace=True)
+    full_data["review_count"] = full_data["review_count"].astype(int)
     full_data.to_csv("data/ecommerce/amazon_products.csv", index=False)
-    print("Amazon data saved.")
+    
+    print(":)))))))))  Amazon data saved.")
