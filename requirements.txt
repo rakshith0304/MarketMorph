@@ -1,7 +1,0 @@
-bs4
-beautifulsoup4
-requests
-pandas
-snscrape
-praw
-sqlite3

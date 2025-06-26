@@ -29,9 +29,12 @@ for sub in subreddits:
             for submission in reddit.subreddit(sub).search(product, limit=20):
                 posts.append({
                     "title": submission.title,
+                    "selftext": submission.selftext,
                     "subreddit": sub,
                     "product_name": product,
                     "upvotes": submission.score,
+                    "num_comments": submission.num_comments,
+                    "author": str(submission.author),
                     "created": dt.datetime.fromtimestamp(submission.created_utc),
                 })
         except Exception as e:

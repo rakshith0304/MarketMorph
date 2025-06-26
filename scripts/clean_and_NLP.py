@@ -22,7 +22,7 @@ def get_sentiment_label(score):
     else:
         return "neutral"
 
-reddit_df["sentiment_score"] = reddit_df["title"].apply(get_sentiment_score)
+reddit_df["sentiment_score"] = reddit_df["selftext"].apply(get_sentiment_score)
 reddit_df["sentiment_label"] = reddit_df["sentiment_score"].apply(get_sentiment_label)
 
 
